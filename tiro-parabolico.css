@@ -3,3 +3,8 @@
     font-family: cursive;
     color: brown;
 }
+
+tr.angulo_minimo td {
+    font-weight: bold;
+    background-color: yellow;
+}

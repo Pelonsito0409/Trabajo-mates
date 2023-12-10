@@ -1,11 +1,12 @@
 <html style="margin: 2em auto; max-width: 1000px;" >
-    <header>
+    <head>
         <title>Página tiro parabólico</title>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="tiro-parabolico.css">
-        <h1 class="titulos_inicio">Como calcular el tiro parabólico</h1>
-    </header>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
     <body>
+        <h1 class="titulos_inicio">Como calcular el tiro parabólico</h1>
         <h3 >Como calcular la velocidad y el ángulo para dar a Barrasus a 2 metros de distancia</h3>
         <p>La parábola del tiro que vayamos a calcular va a depender de 2 cosas: la <strong>velocidad (v)</strong> y el <strong>ángulo (&alpha;)</strong></p>
         <h3>Condicionadores para el cálculo</h3>
@@ -28,14 +29,112 @@
         <h3>Para aclarar dudas he preguntado a Chat-GPT</h3>
         <img src="Chatgpt-explicacion.png" style="width:60%">
         <h3>Para calcular t</h3>
-        <p>Del movimiento horizontal tenemos: L = V<sub>0</sub>*cos(&alpha;)*t</p>
-        <p>Dado que L = 2m &nbsp;&nbsp; entonces &nbsp;&nbsp; t = 2 / (V<sub>0</sub>*cos(&alpha;))</p>
+        <p>Del movimiento horizontal tenemos: L = V<sub>0</sub> * cos(&alpha;)*t</p>
+        <p>Dado que L = 2m &nbsp;&nbsp; entonces &nbsp;&nbsp; t = 2 / (V<sub>0</sub> * cos(&alpha;))</p>
         <p>h<sub>0</sub> y h(t) son ambas = 0</p>
         <h3>Entonces la formula quedaría:</h3>
-        <h3>0 = 0 + V<sub>0</sub>*sin(&alpha;)*t - 0.5*g*t<sup>2</sup></h3>
-        <h3>0 = V<sub>0</sub>*sin(&alpha;) - 0.5*g*t</h3>
+        <h4>0 = 0 + V<sub>0</sub> * sin(&alpha;)*t - 0.5 * g * t<sup>2</sup></h4>
+        <h4>0 = V<sub>0</sub> * sin(&alpha;) - 0.5 * g * t</h4>
         <h3>Sustituimos t en la formula y despejamos V<sub>0</sub></h3>
-        <h3>0 = V<sub>0</sub>*sin(&alpha;) - 0.5*g*2 / (V<sub>0</sub>*cos(&alpha;))</h3>
+        <h3>0 = V<sub>0</sub> * sin(&alpha;) - 0.5 * g * 2 / (V<sub>0</sub> * cos(&alpha;) )</h3>
+        <h3>(0.5 * g * 2) / (V<sub>0</sub> * cos(&alpha;) ) = V<sub>0</sub> * sin(&alpha;)</h3>
+        <h3>g / (V<sub>0</sub> * cos(&alpha;) * sin(&alpha;) ) = V<sub>0</sub></h3>
+        <h3>V<sub>0</sub> * g / (V<sub>0</sub> * cos(&alpha;) * sin(&alpha;) ) = V<sub>0</sub><sup>2</sup></h3>
+        <h3>g / (cos(&alpha;) * sin(&alpha;) ) = V<sub>0</sub><sup>2</sup></h3>
+        <h3>V<sub>0</sub> = &radic; (g / (cos(&alpha;) * sin(&alpha;) ) )</h3>
+        <h3>Ahora graficamos la formula con Chat-GPT, velocidad inicial frente a ángulo de lanzamiento y vemos en qué ángulo se necesita la velocidad mínima</h3>
+        
+        <canvas id="myChart" width="400" height="400"></canvas>        
+        <script>
+            // Definir la función de velocidad inicial
+            function velocidadInicial(alpha, g) {
+              return Math.sqrt(g / (Math.cos(alpha) * Math.sin(alpha)));
+            }
+        
+            // Configurar valores específicos
+            const g = 9.8;
+            const alphaValues = Array.from({ length: 1000 }, (_, i) => (i / 1000) * (Math.PI / 2));
+        
+            // Calcular la velocidad inicial para cada ángulo
+            const v0Values = alphaValues.map(alpha => velocidadInicial(alpha, g));
+        
+            // Configurar y crear el gráfico
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: alphaValues,
+                datasets: [{
+                  label: 'Velocidad Inicial',
+                  data: v0Values,
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  borderWidth: 1,
+                  fill: false
+                }]
+              },
+              options: {
+                scales: {
+                  x: {
+                    type: 'linear',
+                    position: 'bottom'
+                  },
+                  y: {
+                    type: 'linear',
+                    position: 'left'
+                  }
+                }
+              }
+            });
+          </script>
+
+        <table border="1">
+            <thead>
+            <tr>
+                <th>Ángulo (alpha)</th>
+                <th>Velocidad Inicial</th>
+            </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+
+        <script>
+            // Definir la función de velocidad inicial
+            function velocidadInicial(alpha, g) {
+                return Math.sqrt(g / (Math.cos(alpha) * Math.sin(alpha)));
+            }
+
+            // Configurar valores específicos
+            const g2 = 9.8;
+            const alphaValues2 = Array.from({ length: 90 }, (_, i) => (i / 90) * (Math.PI / 2));
+
+            // Crear la tabla
+            const tableBody = document.getElementById('tableBody');
+
+            alphaValues2.forEach(alpha => {
+            const v0 = velocidadInicial(alpha, g);
+
+            // Crear una nueva fila
+            const newRow = document.createElement('tr');
+
+            // Añadir celdas con valores
+            const alphaCell = document.createElement('td');
+            const alpha_grados = alpha * 180 / Math.PI;
+            alphaCell.textContent = alpha_grados.toFixed(0);  // Limitar a 2 decimales
+            const v0Cell = document.createElement('td');
+            if ( alpha_grados == 45) {
+                newRow.classList = 'angulo_minimo'
+            }       
+            v0Cell.innerHTML = v0.toFixed(3);
+
+            // Agregar celdas a la fila
+            newRow.appendChild(alphaCell);
+            newRow.appendChild(v0Cell);
+
+            // Agregar fila al cuerpo de la tabla
+            tableBody.appendChild(newRow);
+            });
+        </script>
+        <h1>Sorpresa, el ángulo óptimo son 45º &#128513;</h1>
         
     </body>
 </html>
